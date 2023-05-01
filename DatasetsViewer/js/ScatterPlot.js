@@ -119,6 +119,27 @@ function getScalesWordFrequency (data, attrName, widthBarChart, heightBarChart) 
 
     return  [words_freq, xScaleBarChar, yScaleBarChar]
 }
+
+function getScaleParallelCoordinate (data) {
+    const dataPC = data.map(d=> ({"size":d.size,  "num_categorical":d.num_categorical, "num_spatial": d.num_spatial, "num_temporal":d.num_temporal }));
+    const attributesPC = Object.keys(dataPC[0]);
+
+    var yScalePCPlot = {}
+    for(var i in attributesPC) {
+        let name = attributesPC[i]
+        yScalePCPlot[name] = d3.scaleLinear()
+        .domain( d3.extent(dataPC, function(d) { return +d[name]; }) )
+        .range([110, 0])
+    }
+
+    // Build the X scale -> it find the best position for each Y axis
+    var xScalePCPlot = d3.scalePoint()
+        .range([0, 400])
+        .padding(1)
+        .domain(attributesPC);
+
+    return  [dataPC, attributesPC, xScalePCPlot, yScalePCPlot];
+}
 function updateBarChart(moduleWordFrequency, textdata, xScaleBarChar, yScaleBarChar, marginTop) {
     moduleWordFrequency
     .selectAll(".horizontalplot")
@@ -146,8 +167,51 @@ function updateBarChart(moduleWordFrequency, textdata, xScaleBarChar, yScaleBarC
         .attr('fill', 'black')
     );
 }
+
+function updateParallelCoordinatePlot(dataPC, attributes, moduleParalellCoordinate, moduleParalellCoordinateAxis, xScalePCPlot, yScalePCPlot) {
+    const shortAttributeNames = new Map(
+        Object.entries({
+            size: "Size",
+            num_categorical: "Categorical",
+            num_spatial: "Spatial",
+            num_temporal: "Temporal",
+        })
+    );
+
+    moduleParalellCoordinate //.append("g")
+    .selectAll(".paralellcoordinateplot")
+    .data(dataPC)
+    .join(
+      enter => enter.append("path")
+        .attr("class", "paralellcoordinateplot")
+        .attr("fill", "none")
+        .attr("stroke-width", 1.5)
+        .attr("stroke-opacity", 0.4)
+        //paint the polylines
+        //https://observablehq.com/@sophiegri/exercise-2-scatterplot-matrix
+        .attr("stroke", "gray")
+        //set the lines
+        //https://observablehq.com/@d3/parallel-coordinates
+        .attr("d", d => d3.line()(attributes.map(function(p) { return [xScalePCPlot(p), yScalePCPlot[p](d[p])]; })))
+    );
+
+    //https://observablehq.com/@d3/parallel-coordinates
+    //set axis to the right and set the text
+    moduleParalellCoordinateAxis.each(function(d) { d3.select(this).call(d3.axisRight().scale(yScalePCPlot[d])); })
+    .call(g => g.append("text")
+        //position of the text
+        .attr("x", 0)
+        .attr("y", -6)
+        .attr("text-anchor", "start")
+        .attr("fill", "currentColor")
+        //.get(d) gets the short name (value) from the Map shortAttributeNames
+        .text(d => shortAttributeNames.get(d)));
+        // .text(function(d) { return d; }));
+}
   
-function highlightSelected(data, moduleWordFrequency, freqTitle, xScaleBarChar, yScaleBarChar, marginTop, widthBarChart, heightBarChart, moduleWordFrequencyDescrip, freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip) {
+function highlightSelected(data, moduleWordFrequency, freqTitle, xScaleBarChar, yScaleBarChar, marginTop, widthBarChart, heightBarChart,
+                                 moduleWordFrequencyDescrip, freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip,
+                                 dataPC, attributesPC, moduleParalellCoordinate, moduleParalellCoordinateAxis, xScalePCPlot, yScalePCPlot) {
     const selectedIDs = data.map(d => d.id);
         selectAll('.scatterdot')
             .filter(d => selectedIDs.includes(d.id))
@@ -160,14 +224,19 @@ function highlightSelected(data, moduleWordFrequency, freqTitle, xScaleBarChar, 
     // Remove all bar charts
     selectAll(".horizontalplot").remove();
     selectAll(".horizontaltextplot").remove();
+    selectAll(".paralellcoordinateplot").remove();
 
     if (data.length > 0 ){
         [freqTitle, xScaleBarChar, yScaleBarChar ] = getScalesWordFrequency (data, "title", widthBarChart, heightBarChart);
         [freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip ] = getScalesWordFrequency (data, "description", widthBarChart, heightBarChart);
+        [dataPC, attributesPC, xScalePCPlot, yScalePCPlot] = getScaleParallelCoordinate(data);
+
 
     }
     updateBarChart(moduleWordFrequency, freqTitle, xScaleBarChar, yScaleBarChar, marginTop);
     updateBarChart(moduleWordFrequencyDescrip, freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip, marginTop);
+    updateParallelCoordinatePlot(dataPC, attributesPC, moduleParalellCoordinate, moduleParalellCoordinateAxis, xScalePCPlot, yScalePCPlot);
+
 }
 
 function wordFreq(string) {
@@ -289,7 +358,7 @@ export function ScatterPlot(ref,
 
     // const getEvent = () => require("d3-selection").event;
 
-    // Bar char with frequent words in title 
+    // 1. Bar char with frequent words in title
     let [freqTitle, xScaleBarChar, yScaleBarChar ] = getScalesWordFrequency (data, "title", widthBarChart, heightBarChart);
 
     const moduleWordFrequencyTitle = svg.selectAll("#gwordfrequencytitle")
@@ -300,13 +369,13 @@ export function ScatterPlot(ref,
         .attr("transform", `translate(${margin.left+width-widthBarChart}, ${margin.top})`)
     );
     moduleWordFrequencyTitle.append("text")
-    .text("Title")
+    .text("TitleSS")
     .attr("x", 0)
     .attr("y", 10)
     .attr("font-size", "12px")
     .attr('fill', 'black');
 
-    // Bar char with frequent words in title 
+    // 2. Bar char with frequent words in Description
     let [freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip ] = getScalesWordFrequency (data, "description", widthBarChart, heightBarChart);
 
     const moduleWordFrequencyDescrip = svg.selectAll("#gwordfrequencydescrip")
@@ -322,6 +391,27 @@ export function ScatterPlot(ref,
     .attr("y", 10)
     .attr("font-size", "12px")
     .attr('fill', 'black');
+
+    // 3. PARALLEL COORDINATES
+    let [dataPC, attributesPC, xScalePCPlot, yScalePCPlot] = getScaleParallelCoordinate(data);
+
+    const moduleParalellCoordinate = svg.selectAll("#gParalellCoordinate")
+    .data([1])
+    .join(
+        enter => enter.append("g")
+        .attr("id", "gParalellCoordinate")
+        .attr("transform", `translate(${margin.left+width-2*widthBarChart}, ${margin.top+160})`)
+    );
+
+    const moduleParalellCoordinateAxis = moduleParalellCoordinate.append("g")
+    .selectAll(".myAxis")
+    .data(attributesPC)
+    .join(
+        enter => enter.append("g")
+        .attr("id", "myAxis")
+        .attr("transform", d => `translate(${xScalePCPlot(d)},0)`)
+    );
+
     // Brushing
     svg
         .on( "mousedown", function() {
@@ -376,7 +466,9 @@ export function ScatterPlot(ref,
                                 yScaleScatterPlot(d.y) < y1
                             );
                 // if(selected.length > 0) {
-                highlightSelected(selected, moduleWordFrequencyTitle, freqTitle, xScaleBarChar, yScaleBarChar, margin.top, widthBarChart, heightBarChart, moduleWordFrequencyDescrip, freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip);
+                highlightSelected(selected, moduleWordFrequencyTitle, freqTitle, xScaleBarChar, yScaleBarChar, margin.top, widthBarChart, heightBarChart,
+                                            moduleWordFrequencyDescrip, freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip,
+                                            dataPC, attributesPC, moduleParalellCoordinate, moduleParalellCoordinateAxis, xScalePCPlot, yScalePCPlot);
                 // }
             }
         })
@@ -388,56 +480,7 @@ export function ScatterPlot(ref,
         // Create bar charts
         updateBarChart(moduleWordFrequencyTitle, freqTitle, xScaleBarChar, yScaleBarChar, margin.top);
         updateBarChart( moduleWordFrequencyDescrip, freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip, margin.top);
-}
+        // Create Parallel Coordinates
+        updateParallelCoordinatePlot(dataPC, attributesPC, moduleParalellCoordinate, moduleParalellCoordinateAxis, xScalePCPlot, yScalePCPlot);
 
-// export function WordCloud(text, {
-//     size = group => group.length, // Given a grouping of words, returns the size factor for that word
-//     word = d => d, // Given an item of the data array, returns the word
-//     marginTop = 0, // top margin, in pixels
-//     marginRight = 0, // right margin, in pixels
-//     marginBottom = 0, // bottom margin, in pixels
-//     marginLeft = 0, // left margin, in pixels
-//     width = 640, // outer width, in pixels
-//     height = 400, // outer height, in pixels
-//     maxWords = 250, // maximum number of words to extract from the text
-//     fontFamily = "sans-serif", // font family
-//     fontScale = 15, // base font size
-//     padding = 0, // amount of padding between the words (in pixels)
-//     rotate = 0, // a constant or function to rotate the words
-//     invalidation // when this promise resolves, stop the simulation
-//   } = {}) {
-//     const words = typeof text === "string" ? text.split(/\W+/g) : Array.from(text);
-    
-//     const data = d3.rollups(words, size, w => w)
-//       .sort(([, a], [, b]) => d3.descending(a, b))
-//       .slice(0, maxWords)
-//       .map(([key, size]) => ({text: word(key), size}));
-//     console.log("wordclouddata");
-//     console.log(data);
-//     const svg = d3.create("svg")
-//         .attr("viewBox", [0, 0, width, height])
-//         .attr("width", width)
-//         .attr("font-family", fontFamily)
-//         .attr("text-anchor", "middle")
-//         .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
-  
-//     const g = svg.append("g").attr("transform", `translate(${marginLeft},${marginTop})`);
-  
-//     const cloud = d3Cloud()
-//         .size([width - marginLeft - marginRight, height - marginTop - marginBottom])
-//         .words(data)
-//         .padding(padding)
-//         .rotate(rotate)
-//         .font(fontFamily)
-//         .fontSize(d => Math.sqrt(d.size) * fontScale)
-//         .on("word", ({size, x, y, rotate, text}) => {
-//           g.append("text")
-//               .attr("font-size", size)
-//               .attr("transform", `translate(${x},${y}) rotate(${rotate})`)
-//               .text(text);
-//         });
-  
-//     cloud.start();
-//     invalidation && invalidation.then(() => cloud.stop());
-//     return svg.node();
-//   }
+}
