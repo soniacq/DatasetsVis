@@ -1,8 +1,6 @@
-// import * as React from 'react';
 import React, {Component} from "react";
 import { Card, Box } from '../node_modules/@material-ui/core/index';
-import {ProfilerView} from './ProfilerView';
-import {ScatterPlot} from './ScatterPlot';
+import {SummaryPlots as SummaryPlots} from './SummaryPlots';
 // Material
 // import Tabs from '@mui/material/Tabs';
 // import Tab from '@mui/material/Tab';
@@ -24,31 +22,7 @@ import {ScatterPlot} from './ScatterPlot';
 // import ImportExportIcon from '@material-ui/icons/ImportExport';
 // import IconButton from '@material-ui/core/IconButton';
 
-const colorTabIndicator = "#FFFFFF";
-
 const widthSVG = 1000;
-
-
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-      style={{ flex: 1 }}
-    >
-      {value === index && (
-        <Box sx={{ width: '100%', height: '100%', display: 'flex', p: 2 }}>
-          <Typography component={'div'} style={{ display: 'flex', flex: 1 }}>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
 
 export function a11yProps(index) {
   return {
@@ -90,34 +64,27 @@ export class SummaryView extends Component {
   // );
   display(props){
     const { hit } = props;
-    ScatterPlot(
+    SummaryPlots(
       this.ref,
       hit,
       widthSVG
     );
-    // WordCloud(text, {
-    //   width: 250,
-    //   height: 100,
-    //   size: () => .3 + Math.random(),
-    //   rotate: () => (~~(Math.random() * 6) - 3) * 30
-    // });
   }
-    // console.log("Hi");
 
-    componentDidMount(){
-      this.display(this.props);
-    }
-  
-    componentDidUpdate(prevProps, prevState){
-      this.display(this.props);
-    }
-  
-    render(){
-      const { hit } = this.props;
-      return (
-      <div style={{position: 'relative', height: 300, width: widthSVG}}>
-        <svg style={{position: 'absolute', left: 0, top: 0}} ref={ref => this.ref = ref}/>
-      </div>
-      );
-    }
+  componentDidMount(){
+    this.display(this.props);
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    this.display(this.props);
+  }
+
+  render(){
+    const { hit } = this.props;
+    return (
+    <div style={{position: 'relative', height: 300, width: widthSVG}}>
+      <svg style={{position: 'absolute', left: 0, top: 0}} ref={ref => this.ref = ref}/>
+    </div>
+    );
+  }
 }
