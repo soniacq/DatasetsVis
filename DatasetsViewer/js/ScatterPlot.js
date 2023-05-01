@@ -199,6 +199,7 @@ function updateParallelCoordinatePlot(dataPC, attributes, moduleParalellCoordina
     //set axis to the right and set the text
     moduleParalellCoordinateAxis.each(function(d) { d3.select(this).call(d3.axisRight().scale(yScalePCPlot[d])); })
     .call(g => g.append("text")
+        .attr("class", "PCAxis")
         //position of the text
         .attr("x", 0)
         .attr("y", -6)
@@ -223,7 +224,8 @@ function highlightSelected(data, moduleWordFrequency, freqTitle, xScaleBarChar, 
      
     // Remove all bar charts
     selectAll(".horizontalplot").remove();
-    selectAll(".horizontaltextplot").remove();
+    selectAll(".PCAxis").remove();
+    selectAll(".paralellcoordinateplot").remove();
     selectAll(".paralellcoordinateplot").remove();
 
     if (data.length > 0 ){
