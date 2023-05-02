@@ -3,10 +3,10 @@ import * as d3 from "d3";
 import {select, selectAll, event, mouse} from "d3-selection";
 import {brush} from  "d3-brush";
 import {scaleBand, scaleLinear, scaleOrdinal} from "d3-scale";
-// import {extent} from "d3-array";
+import {rollups} from "d3-array";
 // import {constants, extractMetric, getPrimitiveLabel} from "../helpers";
 // import "d3-transition";
-import {axisLeft} from "d3-axis";
+import {axisLeft } from "d3-axis";
 import {line, symbols, symbol, symbolCircle, symbolCross, symbolDiamond, symbolSquare, symbolStar, symbolTriangle, symbolWye} from "d3-shape";
 import { d3Cloud } from "d3-cloud"; 
 import './ScatterPlot.css';
@@ -119,6 +119,31 @@ function getScalesWordFrequency (data, attrName, widthBarChart, heightBarChart) 
 
     return  [words_freq, xScaleBarChar, yScaleBarChar]
 }
+
+function getScalesDataTypeFrequency (data, widthBarChart, heightBarChart) {
+
+    let datatypeFreq = [
+                        // {"text": "Size", "size": d3.sum(data, item => item.size)},
+                        {"text": "Categorical", "size": d3.sum(data, item => item.num_categorical)},
+                        {"text": "Spatial", "size": d3.sum(data, item => item.num_spatial)},
+                        {"text": "Temporal", "size": d3.sum(data, item => item.num_temporal)}
+                        ];
+
+    // Add X axis
+    let xScaleDTBarChar = d3.scaleLinear()
+    .range([ 0, widthBarChart])
+    .domain([0, d3.max(datatypeFreq, d => d.size)]);
+
+    // Y axis
+    let yScaleDTBarChar = d3.scaleBand()
+    .range([ 0, heightBarChart ])
+    .domain(datatypeFreq.map(function(d) { return d.text; }))
+    .padding(.1);
+
+    return  [datatypeFreq, xScaleDTBarChar, yScaleDTBarChar];
+}
+
+
 
 function getScaleParallelCoordinate (data) {
     const dataPC = data.map(d=> ({"size":d.size,  "num_categorical":d.num_categorical, "num_spatial": d.num_spatial, "num_temporal":d.num_temporal }));
@@ -379,6 +404,8 @@ export function SummaryPlots(ref,
 
     // 2. Bar char with frequent words in Description
     let [freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip ] = getScalesWordFrequency (data, "description", widthBarChart, heightBarChart);
+console.log("freqDescrip");
+console.log(freqDescrip);
 
     const moduleWordFrequencyDescrip = svg.selectAll("#gwordfrequencydescrip")
     .data([1])
@@ -394,6 +421,30 @@ export function SummaryPlots(ref,
     .attr("font-size", "12px")
     .attr('fill', 'black');
 
+
+    const widthDTBarChart = 100;
+    const heightDTBarChart = 50;
+    let [datatypeFreq, xScaleDTBarChar, yScaleDTBarChar] = getScalesDataTypeFrequency(data, widthDTBarChart, heightDTBarChart);
+
+    // // 2. Bar char with frequent words in Description
+    // let [freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip ] = getScalesWordFrequency (data, "description", widthBarChart, heightBarChart);
+
+    const moduleDataTypeFrequency = svg.selectAll("#gdatatypefrequency")
+    .data([1])
+    .join(
+        enter => enter.append("g")
+        .attr("id", "gdatatypefrequency")
+        .attr("transform", `translate(${margin.left+width-widthBarChart-widthBarChart}, ${margin.top+145})`)
+    );
+    moduleDataTypeFrequency.append("text")
+    .text("Data Types")
+    .attr("x", 0)
+    .attr("y", 10)
+    .attr("font-size", "12px")
+    .attr('fill', 'black');
+
+    updateBarChart(moduleDataTypeFrequency, datatypeFreq, xScaleDTBarChar, yScaleDTBarChar, margin.top);
+
     // 3. PARALLEL COORDINATES
     let [dataPC, attributesPC, xScalePCPlot, yScalePCPlot] = getScaleParallelCoordinate(data);
 
@@ -402,7 +453,7 @@ export function SummaryPlots(ref,
     .join(
         enter => enter.append("g")
         .attr("id", "gParalellCoordinate")
-        .attr("transform", `translate(${margin.left+width-2*widthBarChart}, ${margin.top+160})`)
+        .attr("transform", `translate(${margin.left+width-2*widthBarChart+30}, ${margin.top+160})`)
     );
 
     const moduleParalellCoordinateAxis = moduleParalellCoordinate.append("g")
