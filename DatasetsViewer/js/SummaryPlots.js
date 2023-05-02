@@ -127,7 +127,7 @@ function getScalesDataTypeFrequency (data, widthBarChart, heightBarChart) {
                         {"text": "Categorical", "size": d3.sum(data, item => item.num_categorical)},
                         {"text": "Spatial", "size": d3.sum(data, item => item.num_spatial)},
                         {"text": "Temporal", "size": d3.sum(data, item => item.num_temporal)}
-                        ];
+                        ].sort((a, b) => b.size - a.size);;
 
     // Add X axis
     let xScaleDTBarChar = d3.scaleLinear()
@@ -142,8 +142,6 @@ function getScalesDataTypeFrequency (data, widthBarChart, heightBarChart) {
 
     return  [datatypeFreq, xScaleDTBarChar, yScaleDTBarChar];
 }
-
-
 
 function getScaleParallelCoordinate (data) {
     const dataPC = data.map(d=> ({"size":d.size,  "num_categorical":d.num_categorical, "num_spatial": d.num_spatial, "num_temporal":d.num_temporal }));
@@ -165,6 +163,7 @@ function getScaleParallelCoordinate (data) {
 
     return  [dataPC, attributesPC, xScalePCPlot, yScalePCPlot];
 }
+
 function updateBarChart(moduleWordFrequency, textdata, xScaleBarChar, yScaleBarChar, marginTop) {
     moduleWordFrequency
     .selectAll(".horizontalplot")
@@ -237,7 +236,8 @@ function updateParallelCoordinatePlot(dataPC, attributes, moduleParalellCoordina
   
 function highlightSelected(data, moduleWordFrequency, freqTitle, xScaleBarChar, yScaleBarChar, marginTop, widthBarChart, heightBarChart,
                                  moduleWordFrequencyDescrip, freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip,
-                                 dataPC, attributesPC, moduleParalellCoordinate, moduleParalellCoordinateAxis, xScalePCPlot, yScalePCPlot) {
+                                 dataPC, attributesPC, moduleParalellCoordinate, moduleParalellCoordinateAxis, xScalePCPlot, yScalePCPlot,
+                                 moduleDataTypeFrequency, datatypeFreq, xScaleDTBarChar, yScaleDTBarChar, widthDTBarChart, heightDTBarChart) {
     const selectedIDs = data.map(d => d.id);
         selectAll('.scatterdot')
             .filter(d => selectedIDs.includes(d.id))
@@ -249,19 +249,21 @@ function highlightSelected(data, moduleWordFrequency, freqTitle, xScaleBarChar, 
      
     // Remove all bar charts
     selectAll(".horizontalplot").remove();
+    selectAll(".horizontaltextplot").remove();
     selectAll(".PCAxis").remove();
-    selectAll(".paralellcoordinateplot").remove();
     selectAll(".paralellcoordinateplot").remove();
 
     if (data.length > 0 ){
         [freqTitle, xScaleBarChar, yScaleBarChar ] = getScalesWordFrequency (data, "title", widthBarChart, heightBarChart);
         [freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip ] = getScalesWordFrequency (data, "description", widthBarChart, heightBarChart);
         [dataPC, attributesPC, xScalePCPlot, yScalePCPlot] = getScaleParallelCoordinate(data);
+        [datatypeFreq, xScaleDTBarChar, yScaleDTBarChar] = getScalesDataTypeFrequency(data, widthDTBarChart, heightDTBarChart);
 
 
     }
     updateBarChart(moduleWordFrequency, freqTitle, xScaleBarChar, yScaleBarChar, marginTop);
     updateBarChart(moduleWordFrequencyDescrip, freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip, marginTop);
+    updateBarChart(moduleDataTypeFrequency, datatypeFreq, xScaleDTBarChar, yScaleDTBarChar, marginTop);
     updateParallelCoordinatePlot(dataPC, attributesPC, moduleParalellCoordinate, moduleParalellCoordinateAxis, xScalePCPlot, yScalePCPlot);
 
 }
@@ -385,6 +387,8 @@ export function SummaryPlots(ref,
 
     // const getEvent = () => require("d3-selection").event;
 
+    /******************************* PLOTS **********************************/
+
     // 1. Bar char with frequent words in title
     let [freqTitle, xScaleBarChar, yScaleBarChar ] = getScalesWordFrequency (data, "title", widthBarChart, heightBarChart);
 
@@ -393,7 +397,7 @@ export function SummaryPlots(ref,
     .join(
         enter => enter.append("g")
         .attr("id", "gwordfrequencytitle")
-        .attr("transform", `translate(${margin.left+width-widthBarChart}, ${margin.top})`)
+        .attr("transform", `translate(${margin.left+width-2*widthBarChart}, ${margin.top})`)
     );
     moduleWordFrequencyTitle.append("text")
     .text("Title")
@@ -404,15 +408,13 @@ export function SummaryPlots(ref,
 
     // 2. Bar char with frequent words in Description
     let [freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip ] = getScalesWordFrequency (data, "description", widthBarChart, heightBarChart);
-console.log("freqDescrip");
-console.log(freqDescrip);
 
     const moduleWordFrequencyDescrip = svg.selectAll("#gwordfrequencydescrip")
     .data([1])
     .join(
         enter => enter.append("g")
         .attr("id", "gwordfrequencydescrip")
-        .attr("transform", `translate(${margin.left+width-widthBarChart-widthBarChart}, ${margin.top})`)
+        .attr("transform", `translate(${margin.left+width-widthBarChart +5}, ${margin.top})`)
     );
     moduleWordFrequencyDescrip.append("text")
     .text("Description")
@@ -426,9 +428,7 @@ console.log(freqDescrip);
     const heightDTBarChart = 50;
     let [datatypeFreq, xScaleDTBarChar, yScaleDTBarChar] = getScalesDataTypeFrequency(data, widthDTBarChart, heightDTBarChart);
 
-    // // 2. Bar char with frequent words in Description
-    // let [freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip ] = getScalesWordFrequency (data, "description", widthBarChart, heightBarChart);
-
+    // 3. Bar char using data type frequency. Note that it is the sum of all values in the column.
     const moduleDataTypeFrequency = svg.selectAll("#gdatatypefrequency")
     .data([1])
     .join(
@@ -443,9 +443,8 @@ console.log(freqDescrip);
     .attr("font-size", "12px")
     .attr('fill', 'black');
 
-    updateBarChart(moduleDataTypeFrequency, datatypeFreq, xScaleDTBarChar, yScaleDTBarChar, margin.top);
 
-    // 3. PARALLEL COORDINATES
+    // 4. PARALLEL COORDINATES
     let [dataPC, attributesPC, xScalePCPlot, yScalePCPlot] = getScaleParallelCoordinate(data);
 
     const moduleParalellCoordinate = svg.selectAll("#gParalellCoordinate")
@@ -465,7 +464,7 @@ console.log(freqDescrip);
         .attr("transform", d => `translate(${xScalePCPlot(d)},0)`)
     );
 
-    // Brushing
+    /********************** BRUSHING ***********************/
     svg
         .on( "mousedown", function() {
             var p = mouse( this);
@@ -518,11 +517,11 @@ console.log(freqDescrip);
                                 y0 <= yScaleScatterPlot(d.y) &&
                                 yScaleScatterPlot(d.y) < y1
                             );
-                // if(selected.length > 0) {
+                /********************** UPDATED PLOTS BASED ON DATASETS SELECTION ***********************/
                 highlightSelected(selected, moduleWordFrequencyTitle, freqTitle, xScaleBarChar, yScaleBarChar, margin.top, widthBarChart, heightBarChart,
                                             moduleWordFrequencyDescrip, freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip,
-                                            dataPC, attributesPC, moduleParalellCoordinate, moduleParalellCoordinateAxis, xScalePCPlot, yScalePCPlot);
-                // }
+                                            dataPC, attributesPC, moduleParalellCoordinate, moduleParalellCoordinateAxis, xScalePCPlot, yScalePCPlot,
+                                            moduleDataTypeFrequency, datatypeFreq, xScaleDTBarChar, yScaleDTBarChar, widthDTBarChart, heightDTBarChart);
             }
         })
         .on( "mouseup", function() {
@@ -530,9 +529,14 @@ console.log(freqDescrip);
 
         });
 
-        // Create bar charts
+        /********************** RENDER PLOTS ***********************/
+
+        // Create bar charts using Title (word frequency)
         updateBarChart(moduleWordFrequencyTitle, freqTitle, xScaleBarChar, yScaleBarChar, margin.top);
+        // Create bar charts using Description (word frequency)
         updateBarChart( moduleWordFrequencyDescrip, freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip, margin.top);
+        // Create bar charts using data types (Categorical, Temporal, and Spatial)
+        updateBarChart(moduleDataTypeFrequency, datatypeFreq, xScaleDTBarChar, yScaleDTBarChar, margin.top);
         // Create Parallel Coordinates
         updateParallelCoordinatePlot(dataPC, attributesPC, moduleParalellCoordinate, moduleParalellCoordinateAxis, xScalePCPlot, yScalePCPlot);
 
