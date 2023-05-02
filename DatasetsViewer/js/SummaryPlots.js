@@ -295,7 +295,9 @@ function wordFreq(string) {
 
 export function SummaryPlots(ref,
                             dataJSON,
-                            widthSVG
+                            widthSVG,
+                            xPositionName,
+                            yPositionName
                                 //    pipelines,
                                 //    moduleNames,
                                 //    importances,
@@ -328,10 +330,10 @@ export function SummaryPlots(ref,
 
     const widthBarChart = 200;
     const heightBarChart = 100;
-    const marginRightDotPlot = 10;
+    const marginRightDotPlot = 15;
     // Add X axis
     let xScaleScatterPlot = d3.scaleLinear()
-        .domain([0, 300])
+        .domain([0,  d3.max(data, d => d[xPositionName])])
         .range([ 0, width - 2*widthBarChart - marginRightDotPlot]);
     // svg.append("g")
     //     .attr("class", "myXaxis axis")   // Note that here we give a class to the X axis, to be able to call it later and modify it
@@ -341,8 +343,8 @@ export function SummaryPlots(ref,
 
     // Add Y axis
     let yScaleScatterPlot = d3.scaleLinear()
-        .domain([0, 300])
-        .range([ height-margin.top, 0]);
+        .domain([0, d3.max(data, d => d[yPositionName])])
+        .range([ height-margin.top, margin.top]);
     // svg.append("g")
     //     .attr("class", "axis")
     //     .call(d3.axisLeft(yScale));
@@ -363,8 +365,8 @@ export function SummaryPlots(ref,
     
     moduleDots.append("rect")
     .attr("x", 0)
-    .attr("y", margin.top)
-    .attr("width", width - 2*widthBarChart  - marginRightDotPlot )
+    .attr("y", margin.top-5)
+    .attr("width", width - 2*widthBarChart - marginRightDotPlot + 5)
     .attr("height", height-margin.top)
     .attr("stroke", "grey")
     .attr("stroke-opacity", 0.8)
@@ -377,8 +379,8 @@ export function SummaryPlots(ref,
     .join(
         enter => enter.append("circle")
         .attr("class", "scatterdot")
-        .attr("cx", function (d) { return xScaleScatterPlot(d.x); } )
-        .attr("cy", function (d) { return yScaleScatterPlot(d.y); } )
+        .attr("cx", function (d) { return xScaleScatterPlot(d[xPositionName]); } )
+        .attr("cy", function (d) { return yScaleScatterPlot(d[yPositionName]); } )
         .attr("r", 1.5)
         .style("fill", "#69b3a2")
         // .on("mouseover", function(){d3.select(this).style("fill", "aliceblue");})

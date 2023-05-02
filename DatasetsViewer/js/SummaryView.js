@@ -67,7 +67,9 @@ export class SummaryView extends Component {
     SummaryPlots(
       this.ref,
       hit,
-      widthSVG
+      widthSVG,
+      "x",
+      "y"
     );
   }
 
