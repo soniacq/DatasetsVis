@@ -35,41 +35,20 @@ export class SummaryView extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      selectMetric: this.props.similarityMetrics[0].name,
+      xname: this.props.similarityMetrics[0].x,
+      yname: this.props.similarityMetrics[0].y
     };
+    this.handleChangeSimilarityMetric = this.handleChangeSimilarityMetric.bind(this);
   }
-
-// export default function SummaryView() {
-//   const [value, setValue] = React.useState(0);
-//   const handleChange = (event, newValue) => {
-//     setValue(newValue);
-//   };  
-//   const svgRef = useRef(null);
-
-  // plotPipelineMatrix(
-  //   this.ref,
-  //   data,
-  //   pipelines,
-  //   moduleNames,
-  //   importances,
-  //   selectedPipelines,
-  //   selectedPipelinesColorScale,
-  //   onClick,
-  //   onHover,
-  //   onSelectExpandedPrimitive,
-  //   expandedPrimitiveData,
-  //   expandedPrimitiveName,
-  //   metricRequest,
-  //   highlightPowersetColumns,
-  //   sortColumnBy
-  // );
   display(props){
     const { hit } = props;
     SummaryPlots(
       this.ref,
       hit,
       widthSVG,
-      "x",
-      "y"
+      this.state.xname,
+      this.state.yname,
     );
   }
 
@@ -81,12 +60,33 @@ export class SummaryView extends Component {
     this.display(this.props);
   }
 
+  handleChangeSimilarityMetric (e) {
+    const selectedSimiMetric = e.target.value;
+    this.setState({selectMetric: selectedSimiMetric,  xname: this.props.similarityMetrics.filter(d => d.name === selectedSimiMetric)[0].x, yname: this.props.similarityMetrics.filter(d => d.name === selectedSimiMetric)[0].y });
+  }
+
   render(){
-    const { hit } = this.props;
+    const { hit, similarityMetrics } = this.props;
     return (
-    <div style={{position: 'relative', height: 300, width: widthSVG}}>
-      <svg style={{position: 'absolute', left: 0, top: 0}} ref={ref => this.ref = ref}/>
-    </div>
+    <>
+      <div className={"unselected-field"} style={{display: "inline-block"}}>
+          <span>Similarity Metric based on: </span>
+          <select
+            value={this.state.selectMetric}
+            onChange={this.handleChangeSimilarityMetric}
+          >
+            {
+              similarityMetrics.map(metricRequest => {
+                return <option key={metricRequest.name} value={metricRequest.name}>{metricRequest.name}</option>
+              })
+            }
+          </select>
+      </div>
+
+      <div style={{position: 'relative', height: 300, width: widthSVG}}>
+        <svg style={{position: 'absolute', left: 0, top: 0}} ref={ref => this.ref = ref}/>
+      </div>
+    </>
     );
   }
 }

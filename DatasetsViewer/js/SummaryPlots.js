@@ -313,7 +313,7 @@ export function SummaryPlots(ref,
                                 //    sortColumnBy
                                    ) {
     const data = dataJSON.datasets;
-    //
+
     // var margin = {top: 10, right: 30, bottom: 30, left: 60},
     var margin = {top: 20, right: 0, bottom: 0, left: 0},
 
@@ -328,6 +328,7 @@ export function SummaryPlots(ref,
     //     .attr("transform",
     //         "translate(" + margin.left + "," + margin.top + ")")
 
+    svg.selectAll("*").remove();
     const widthBarChart = 200;
     const heightBarChart = 100;
     const marginRightDotPlot = 15;
@@ -514,10 +515,10 @@ export function SummaryPlots(ref,
                 var x0 = parseFloat(d.x), y0 = parseFloat(d.y) - margin.top, x1 = parseFloat(d.x) + d.width, y1 = parseFloat(d.y) - margin.top + d.height;
                 const selected = data.filter(
                             d =>
-                                x0 <= xScaleScatterPlot(d.x) &&
-                                xScaleScatterPlot(d.x) < x1 &&
-                                y0 <= yScaleScatterPlot(d.y) &&
-                                yScaleScatterPlot(d.y) < y1
+                                x0 <= xScaleScatterPlot(d[xPositionName]) &&
+                                xScaleScatterPlot(d[xPositionName]) < x1 &&
+                                y0 <= yScaleScatterPlot(d[yPositionName]) &&
+                                yScaleScatterPlot(d[yPositionName]) < y1
                             );
                 /********************** UPDATED PLOTS BASED ON DATASETS SELECTION ***********************/
                 highlightSelected(selected, moduleWordFrequencyTitle, freqTitle, xScaleBarChar, yScaleBarChar, margin.top, widthBarChart, heightBarChart,
