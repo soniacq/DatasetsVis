@@ -1,3 +1,4 @@
+import ast
 import pkg_resources
 import string
 import numpy as np
@@ -21,7 +22,14 @@ def comm_export_metadata(msg):
     exportedMetadata = msg['metadata']
     updatedColumns = msg['metadata']
     return {}
+
+def formatMetadata(msg):
+    json_data = ast.literal_eval(msg['dataneedformat'])
+    data_dict = prepare_data_profiler( json_data)
+    return {"newformatmetadata": data_dict}
+
 setup_comm_api('export_metadata_comm_api', comm_export_metadata)
+setup_comm_api('format_metadata_comm_api', formatMetadata)
 
 def get_exported_metadata(data_path):
     global exportedMetadata
@@ -43,7 +51,7 @@ def id_generator(size=15):
     return ''.join(np.random.choice(chars, size, replace=True))
 
 
-def make_html(data_dict, dataset_results, id):
+def make_html(dataset_results, id):
 	lib_path = pkg_resources.resource_filename(__name__, "build/datasetsVis.js")
 	bundle = open(lib_path, "r", encoding="utf8").read()
 	html_all = """
@@ -57,11 +65,11 @@ def make_html(data_dict, dataset_results, id):
 	    <div id="{id}">
 	    </div>
 	    <script>
-	        datasetsVis.renderProfilerViewBundle("#{id}", {data_dict}, {dataset_results});
+	        datasetsVis.renderProfilerViewBundle("#{id}", {dataset_results});
 	    </script>
 	</body>
 	</html>
-	""".format(bundle=bundle, id=id, data_dict=json.dumps(data_dict), dataset_results=json.dumps(dataset_results))
+	""".format(bundle=bundle, id=id, dataset_results=json.dumps(dataset_results))
 	return html_all
 
 def edit_profiler_make_html(data_dict, id):
@@ -92,10 +100,9 @@ def getSample(text):
   
 def prepare_data_profiler(metadata, enet_alpha=0.001, enet_l1=0.1):
     metadata = copy.deepcopy(metadata)
-    
     metadataJSON = {
         "id": str(random.randint(0, 10)),
-        "name": '',
+        "name": metadata["name"] if "name" in metadata else "",
         "description": '',
         "size": metadata["size"] if "size" in metadata else 0,
         "nb_rows": metadata["nb_rows"],
@@ -128,12 +135,11 @@ def prepare_dataset_results(dataframe):
     }
     return all_results
 
-def plot_data_summary(metadata, dataset_results):
+def plot_data_summary(dataset_results):
     from IPython.core.display import display, HTML
     id = id_generator()
-    data_dict = prepare_data_profiler(metadata)
     dataset_results_dic = prepare_dataset_results(dataset_results)
-    html_all = make_html(data_dict, dataset_results_dic, id)
+    html_all = make_html(dataset_results_dic, id)
     display(HTML(html_all))
 
 def plot_edit_profiler(metadata):

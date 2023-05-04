@@ -42,13 +42,17 @@ export class SummaryView extends Component {
     this.handleChangeSimilarityMetric = this.handleChangeSimilarityMetric.bind(this);
   }
   display(props){
-    const { hit } = props;
+    const {
+      hit,
+      onClick
+    } = props;
     SummaryPlots(
       this.ref,
       hit,
       widthSVG,
       this.state.xname,
       this.state.yname,
+      onClick
     );
   }
 
@@ -57,7 +61,9 @@ export class SummaryView extends Component {
   }
 
   componentDidUpdate(prevProps, prevState){
-    this.display(this.props);
+    if(this.state.selectMetric !== prevState.selectMetric){
+      this.display(this.props);
+    }
   }
 
   handleChangeSimilarityMetric (e) {
@@ -90,3 +96,7 @@ export class SummaryView extends Component {
     );
   }
 }
+
+SummaryView.defaultProps = {
+  onClick: ()=>{}
+};

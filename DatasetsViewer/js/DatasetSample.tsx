@@ -359,7 +359,7 @@ class DatasetSample extends React.PureComponent<
 
     return (
       <div className="mt-2">
-        <h6>Dataset Sample:</h6>
+        <h6>{hit.metadata.name ? hit.metadata.name : ""}<small> (dataset Sample)</small></h6>
         <div>
           <div
             className="btn-group btn-group-sm"

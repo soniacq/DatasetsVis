@@ -21,86 +21,8 @@ const mySymbols = [
   symbolStar
 ];
 
-// export function computePipelineMatrixWidthHeight(pipelines, moduleNames, expandedPrimitiveData) {
-//   let svgWidth = constants.pipelineNameWidth + moduleNames.length * constants.cellWidth + constants.pipelineScoreWidth +
-//     constants.margin.left + constants.margin.right;
-
-//   if (expandedPrimitiveData) {
-//     svgWidth += expandedPrimitiveData.orderedHeader.length * constants.cellWidth + constants.widthSeparatorPrimitiveHyperparam;
-//   }
-
-//   const svgHeight = pipelines.length * constants.cellHeight + constants.moduleNameHeight + constants.moduleImportanceHeight +
-//     constants.margin.top + constants.margin.bottom;
-
-//   return {svgWidth, svgHeight};
-// }
-
-// function computeBracketsHyperparams(orderedHeader) {
-
-//   if (orderedHeader.length === 0) {
-//     return [];
-//   }
-
-//   let currentBegin = orderedHeader[0];
-//   let brackets = [];
-//   const getKey = (x) => x.split(":")[0];
-
-//   for (let i = 1; i < orderedHeader.length; ++i) {
-//     if (getKey(currentBegin) !== getKey(orderedHeader[i])) {
-//       brackets.push({
-//         begin: currentBegin,
-//         end: orderedHeader[i - 1]
-//       });
-//       currentBegin = orderedHeader[i]
-//     }
-//   }
-//   // Adding last bracket
-//   brackets.push({
-//     begin: currentBegin,
-//     end: orderedHeader[orderedHeader.length - 1]
-//   });
-//   return brackets;
-// }
-
 const hoveredColor = "#720400";
 const unhoveredColor = "#797979";
-
-// function plotModuleSeparatorLines(svg, pipelines, moduleNames, infos, colScale, sortColumnBy){
-//   const separators = [];
-//   if (sortColumnBy === constants.sortModuleBy.moduleType){
-//     let prevModuleType = infos[moduleNames[0]].module_type;
-//     for (const moduleName of moduleNames){
-//       const moduleType = infos[moduleName].module_type;
-//       if (moduleType !== prevModuleType){
-//         separators.push(colScale(moduleName));
-//         prevModuleType = moduleType;
-//       }
-//     }
-//   }
-
-//   const separatorLines = svg.selectAll(".separatorLines")
-//     .data([separators])
-//     .join(
-//       enter => enter
-//         .append("g")
-//         .attr("class", "separatorLines"),
-//       update => update
-//   );
-
-//   separatorLines.selectAll("line")
-//     .data(x => x)
-//     .join(
-//       enter => enter
-//         .append("line")
-//         .attr("x1",x=>x + constants.margin.left + constants.pipelineNameWidth)
-//         .attr("x2",x=>x + constants.margin.left + constants.pipelineNameWidth)
-//         .attr("y1",constants.margin.top + constants.moduleNameHeight - constants.cellHeight)
-//         .attr("y2",constants.margin.top + constants.moduleNameHeight + constants.moduleImportanceHeight + constants.cellHeight * pipelines.length)
-//         .style("stroke", hoveredColor)
-//         .style("stroke-dasharray", 4),
-//       update => update
-//     )
-// }
 
 function getScalesWordFrequency (data, attrName, widthBarChart, heightBarChart) {
     let words = data.map(d => d[attrName]).join(' ');
@@ -286,6 +208,11 @@ function mouseout() {
       .style('fill', 'red')
 }
 
+function onclickData() {
+    const selectedDataFullMetadata = select(this).data()[0].full_metadata;
+    onClick(selectedDataFullMetadata); // THIS DOESNOT WORK.
+}
+
 // Reduce the digits. Ex: from 1000 to 1k
 function formatTicks(d) {
     return d3.format('~s')(d);
@@ -307,6 +234,7 @@ function updateSelected(data) {
                 return `<span class="selected-title">${d.title}</span>, ${formatTicks(d.size)} <br> Categorical: ${d.num_categorical} | Temporal: ${d.num_temporal} | Spatial: ${d.num_spatial}`
                 // <br> data: ${d.start_date}
             })
+    .on('click', onclickData)
     .on('mouseover', mouseover)
     .on('mouseout', mouseout),
         update => update,
@@ -343,20 +271,8 @@ export function SummaryPlots(ref,
                             dataJSON,
                             widthSVG,
                             xPositionName,
-                            yPositionName
-                                //    pipelines,
-                                //    moduleNames,
-                                //    importances,
-                                //    selectedPipelines,
-                                //    selectedPipelinesColorScale,
-                                //    onClick,
-                                //    onHover,
-                                //    onSelectExpandedPrimitive,
-                                //    expandedPrimitiveData,
-                                //    expandedPrimitiveName,
-                                //    metricRequest,
-                                //    highlightPowersetColumns,
-                                //    sortColumnBy
+                            yPositionName,
+                            onClick
                                    ) {
     const data = dataJSON.datasets;
 
@@ -574,7 +490,32 @@ export function SummaryPlots(ref,
                                             moduleWordFrequencyDescrip, freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip,
                                             dataPC, attributesPC, moduleParalellCoordinate, moduleParalellCoordinateAxis, xScalePCPlot, yScalePCPlot,
                                             moduleDataTypeFrequency, datatypeFreq, xScaleDTBarChar, yScaleDTBarChar, widthDTBarChart, heightDTBarChart);
-                updateSelected(selected);
+
+                /**************** Update selected/dataset elements ***************/
+                // updateSelected(selected);
+                    // clean interface
+                    selectAll(".selected-element").remove();
+                    // add selected datasets
+                    select('.selected-body')
+                    .selectAll('.selected-element')
+                    .data(selected, d => d.id)
+                    .join(
+                        enter => enter
+                            .append('p')
+                            .attr('class', 'selected-element')
+                            .html(d => {
+                                return `<span class="selected-title">${d.title}</span>, ${formatTicks(d.size)} <br> Categorical: ${d.num_categorical} | Temporal: ${d.num_temporal} | Spatial: ${d.num_spatial}`
+                            })
+                    .on('click', function() {
+                        const selectedDataFullMetadata = select(this).data()[0].full_metadata;
+                        console.log(selectedDataFullMetadata);
+                        onClick(selectedDataFullMetadata);
+                    })
+                    .on('mouseover', mouseover)
+                    .on('mouseout', mouseout),
+                        update => update,
+                        exit => exit.remove()
+                    );
             }
         })
         .on( "mouseup", function() {

@@ -3,20 +3,34 @@ import PropTypes from 'prop-types';
 import {DatasetSample} from './DatasetSample';
 import { Card, Box } from '../node_modules/@material-ui/core/index';
 import {SummaryView} from "./SummaryView";
+import CommAPI from "./CommAPI";
 
 export class MainView extends Component {
   constructor(props){
     super(props);
+    this.commFormatMetadata = new CommAPI('format_metadata_comm_api', (msg) => {
+      this.setState({ fullMetadata: msg.newformatmetadata });
+    });
     this.state = {
+      fullMetadata: ""
     };
+    this.handleChangeDataset = this.handleChangeDataset.bind(this);
+
   }
 
   componentDidCatch(error, info) {
     console.log(error);
   }
 
+  componentDidUpdate(prevProps, prevState){
+  }
+
+  handleChangeDataset (value) {
+    this.commFormatMetadata.call({dataneedformat: value});
+  }
+
   render(){
-    const {data, dataset_results} = this.props;
+    const { dataset_results } = this.props;
     const similarityMetrics = [
       {name: "Title", x: "title_x", y: "title_y"},
       {name: "Description", x: "description_x", y: "description_y"},
@@ -26,7 +40,14 @@ export class MainView extends Component {
 
     return <div ref={ref=>{this.ref = ref}}>
       <div  className="d-flex flex-row">
-        <SummaryView hit={dataset_results} similarityMetrics={similarityMetrics}/>
+        <SummaryView  hit={dataset_results}
+          similarityMetrics={similarityMetrics}
+          onClick={
+            (selectedDataset) => {
+              this.handleChangeDataset (selectedDataset);
+            }
+          }
+        />
         <div className="row">
           <div className="column-left">
             <div className="selected-container">
@@ -35,7 +56,9 @@ export class MainView extends Component {
             </div>
           </div>
           <div className="column-right">
-            <DatasetSample hit={data} />
+            {
+              this.state.fullMetadata !== "" && <DatasetSample hit={this.state.fullMetadata}/>
+            }
           </div>
         </div>
       </div>
