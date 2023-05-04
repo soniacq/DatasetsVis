@@ -374,7 +374,10 @@ export function SummaryPlots(ref,
     //     .attr("transform",
     //         "translate(" + margin.left + "," + margin.top + ")")
 
+    /******************************* SCATTTERPLOT **********************************/
+
     svg.selectAll("*").remove();
+
     const widthBarChart = 200;
     const heightBarChart = 100;
     const marginRightDotPlot = 15;
@@ -438,7 +441,7 @@ export function SummaryPlots(ref,
 
     /******************************* PLOTS **********************************/
 
-    // 1. Bar char with frequent words in title
+    // 1. BAR CHART with frequent words in title
     let [freqTitle, xScaleBarChar, yScaleBarChar ] = getScalesWordFrequency (data, "title", widthBarChart, heightBarChart);
 
     const moduleWordFrequencyTitle = svg.selectAll("#gwordfrequencytitle")
@@ -455,7 +458,7 @@ export function SummaryPlots(ref,
     .attr("font-size", "12px")
     .attr('fill', 'black');
 
-    // 2. Bar char with frequent words in Description
+    // 2. BAR CHART with frequent words in Description
     let [freqDescrip, xScaleBarCharDescrip, yScaleBarCharDescrip ] = getScalesWordFrequency (data, "description", widthBarChart, heightBarChart);
 
     const moduleWordFrequencyDescrip = svg.selectAll("#gwordfrequencydescrip")
@@ -477,7 +480,7 @@ export function SummaryPlots(ref,
     const heightDTBarChart = 50;
     let [datatypeFreq, xScaleDTBarChar, yScaleDTBarChar] = getScalesDataTypeFrequency(data, widthDTBarChart, heightDTBarChart);
 
-    // 3. Bar char using data type frequency. Note that it is the sum of all values in the column.
+    // 3. BAR CHART using data type frequency. Note that it is the sum of all values in the column.
     const moduleDataTypeFrequency = svg.selectAll("#gdatatypefrequency")
     .data([1])
     .join(
