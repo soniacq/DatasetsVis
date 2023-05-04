@@ -27,7 +27,17 @@ export class MainView extends Component {
     return <div ref={ref=>{this.ref = ref}}>
       <div  className="d-flex flex-row">
         <SummaryView hit={dataset_results} similarityMetrics={similarityMetrics}/>
-        <DatasetSample hit={data} />
+        <div className="row">
+          <div className="column-left">
+            <div className="selected-container">
+              <div className="selected-header">Selected Datasets:</div>
+              <div className="selected-body"></div>
+            </div>
+          </div>
+          <div className="column-right">
+            <DatasetSample hit={data} />
+          </div>
+        </div>
       </div>
     </div>
   }
