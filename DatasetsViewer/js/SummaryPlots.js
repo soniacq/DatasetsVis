@@ -268,9 +268,29 @@ function highlightSelected(data, moduleWordFrequency, freqTitle, xScaleBarChar, 
 
 }
 
+// Highlighting the associated dot in the scatterplot after dataset selection through the list of datasets (when the mouse is hovered over the dataset it changes appearance)
+function mouseover() {
+    const selectedID = select(this).data()[0].id;
+    d3.selectAll('.scatterdot')
+      .filter(d => d.id === selectedID)
+      .transition()
+      .attr('r', 6)
+      .style('fill', 'coral')
+}
+function mouseout() {
+    const selectedID = select(this).data()[0].id;
+    d3.selectAll('.scatterdot')
+      .filter(d => d.id === selectedID)
+      .transition()
+      .attr('r', 1.5)
+      .style('fill', 'red')
+}
+
+// Reduce the digits. Ex: from 1000 to 1k
 function formatTicks(d) {
     return d3.format('~s')(d);
 }
+
 // Update selected/dataset elements
 function updateSelected(data) {
     // clean interface
