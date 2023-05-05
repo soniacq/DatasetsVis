@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name="datasets-viewer",
-    version="0.1.6",
+    name="datasets-summarizer",
+    version="0.1.0",
     author="Sonia Castelo",
     author_email="s.castelo@nyu.edu",
     description="Datasets Summary Viewer. Enables the exploration of dataset search results in Jupyter Notebooks",

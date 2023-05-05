@@ -1,2 +1,2 @@
-include DataProfileViewer/build/dataProfileVis.js
-include DataProfileViewer/data/lifeexpectancydata.csv
+include DatasetsSummarizer/build/dataProfileVis.js
+include DatasetsSummarizer/data/lifeexpectancydata.csv

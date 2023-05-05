@@ -1,0 +1,59 @@
+/* ScatterPlot */
+.selection {
+    stroke          : gray;
+    stroke-width    : 1px;
+    stroke-dasharray: 4px;
+    stroke-opacity  : 0.5;
+    fill            : transparent;
+}
+
+
+
+/* Selected dataset elements container  */
+.selected-container {
+    display: flex;
+    flex-direction: column;
+    margin-left: 0; /* 1rem;*/
+  }
+
+.selected-header {
+    background: #f0f0f0;
+    color: #777;
+    padding: 0.5rem 1rem;
+    text-align: left;
+}
+
+.selected-body {
+    font-size: 0.8em;
+    overflow: auto;
+    cursor: default;
+}
+
+.selected-title {
+    font-weight: bold;
+}
+
+.selected-element {
+    margin: 0.5em;
+    padding: 0.5em;
+    transition: background-color 200ms ease;
+}
+.selected-element:hover {
+    background-color: #f0f0f0;
+}
+
+/* Double column  */
+.column-left {
+    float: left;
+    width: 30%;
+}
+.column-right {
+    float: left;
+    width: 70%;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
