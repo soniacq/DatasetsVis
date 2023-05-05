@@ -5,7 +5,8 @@ DatasetsSummarizer/__init__.py
 DatasetsSummarizer/_comm_api.py
 DatasetsSummarizer/_demodata.py
 DatasetsSummarizer/_plot_metadata_table.py
-DatasetsSummarizer/data/lifeexpectancydata.csv
+DatasetsSummarizer/build/datasetsVis.js
+DatasetsSummarizer/data/taxi_metadata_cleaned_cols_only.csv
 datasets_summarizer.egg-info/PKG-INFO
 datasets_summarizer.egg-info/SOURCES.txt
 datasets_summarizer.egg-info/dependency_links.txt

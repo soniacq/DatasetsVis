@@ -9,6 +9,9 @@ Datasets Summarizer is compatible with Jupyter Notebooks. Need the x and y value
 
 ## Demo
 
+Live demo (Google Colab):
+- [Dataset results for Taxi query](https://colab.research.google.com/drive/11NT0qudr2di9NXlR-DxZa0buzGreOqxs?authuser=2#scrollTo=I0_O75DsoIzA)
+
 In Jupyter Notebook:
 ```Python
 import DatasetsSummarizer
