@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: datasets-viewer
-Version: 0.1.5
+Version: 0.1.6
 Summary: Datasets Summary Viewer. Enables the exploration of dataset search results in Jupyter Notebooks
 Home-page: https://github.com/soniacq/DatasetsVis
 Author: Sonia Castelo

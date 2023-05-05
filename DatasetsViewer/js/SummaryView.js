@@ -1,35 +1,7 @@
 import React, {Component} from "react";
-import { Card, Box } from '../node_modules/@material-ui/core/index';
 import {SummaryPlots as SummaryPlots} from './SummaryPlots';
-// Material
-// import Tabs from '@mui/material/Tabs';
-// import Tab from '@mui/material/Tab';
-// import Typography from '@mui/material/Typography';
-// import Box from '@mui/material/Box';
-
-// Tabs
-// import AppBar from '@mui/material/AppBar';
-// import Toolbar from '@mui/material/Toolbar';
-// import IconButton from '@mui/material/IconButton';
-// import MenuIcon from '@mui/icons-material/Menu';
-
-
-// import React, {Component} from "react";
-// import PropTypes from 'prop-types';
-// import {plotPipelineMatrix, computePipelineMatrixWidthHeight} from "./plotPipelineMatrix";
-// import "./pipelineMatrix.css";
-// import {constants} from "../helpers";
-// import ImportExportIcon from '@material-ui/icons/ImportExport';
-// import IconButton from '@material-ui/core/IconButton';
 
 const widthSVG = 1000;
-
-export function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`
-  };
-}
 
 export class SummaryView extends Component {
   constructor(props) {

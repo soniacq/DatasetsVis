@@ -1,15 +1,9 @@
 import "d3-selection";
 import * as d3 from "d3";
 import {select, selectAll, event, mouse} from "d3-selection";
-import {brush} from  "d3-brush";
-import {scaleBand, scaleLinear, scaleOrdinal} from "d3-scale";
-import {rollups} from "d3-array";
-// import {constants, extractMetric, getPrimitiveLabel} from "../helpers";
-// import "d3-transition";
 import {axisLeft } from "d3-axis";
 import {line, symbols, symbol, symbolCircle, symbolCross, symbolDiamond, symbolSquare, symbolStar, symbolTriangle, symbolWye} from "d3-shape";
-import { d3Cloud } from "d3-cloud"; 
-import './ScatterPlot.css';
+import './SummaryPlots.css';
 
 const mySymbols = [
   symbolCircle,

@@ -90,66 +90,7 @@ export interface SearchResult {
   sample: string[][];
 }
 
-// export interface SearchResponse {
-//   results: SearchResult[];
-// }
 
-// export interface Variable {
-//   type: string;
-// }
-
-// export interface TemporalVariable {
-//   type: 'temporal_variable';
-//   start?: string;
-//   end?: string;
-//   granularity?: string;
-// }
-
-// export interface GeoSpatialVariable {
-//   type: 'geospatial_variable';
-//   latitude1: string;
-//   longitude1: string;
-//   latitude2: string;
-//   longitude2: string;
-// }
-
-// export interface TabularVariable {
-//   type: 'tabular_variable';
-//   columns: number[];
-//   relationship: string;
-// }
-
-// export type FilterVariables =
-//   | TabularVariable
-//   | TemporalVariable
-//   | GeoSpatialVariable;
-
-// export interface QuerySpec {
-//   keywords?: string;
-//   source?: string[];
-//   types?: string[];
-//   variables: FilterVariables[];
-// }
-
-// interface RelatedToFileBase {
-//   kind: string;
-//   name: string;
-//   fileSize?: number;
-// }
-
-// export interface RelatedToLocalFile extends RelatedToFileBase {
-//   kind: 'localFile';
-//   token: string;
-//   tabularVariables?: TabularVariable;
-// }
-
-// export interface RelatedToSearchResult extends RelatedToFileBase {
-//   kind: 'searchResult';
-//   datasetId: string;
-//   tabularVariables?: TabularVariable;
-// }
-
-// export type RelatedFile = RelatedToLocalFile | RelatedToSearchResult;
 
 export interface NumericalDataVegaFormat {
   count: number;

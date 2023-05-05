@@ -13,36 +13,12 @@ import datamart_profiler
 import pandas
 from io import StringIO
 
-exportedMetadata = {}
-updatedColumns = {}
-
-def comm_export_metadata(msg):
-    global exportedMetadata
-    global updatedColumns
-    exportedMetadata = msg['metadata']
-    updatedColumns = msg['metadata']
-    return {}
-
 def formatMetadata(msg):
     json_data = ast.literal_eval(msg['dataneedformat'])
     data_dict = prepare_data_profiler( json_data)
     return {"newformatmetadata": data_dict}
 
-setup_comm_api('export_metadata_comm_api', comm_export_metadata)
 setup_comm_api('format_metadata_comm_api', formatMetadata)
-
-def get_exported_metadata(data_path):
-    global exportedMetadata
-    manual_annotations = {}
-    manual_annotations['manual_annotations'] = {'columns' : exportedMetadata}
-    metadata = datamart_profiler.process_dataset(data_path, include_sample=True, plots=True, metadata=manual_annotations)
-    exportedMetadata = metadata
-    return exportedMetadata
-
-def get_updated_columns():
-    global updatedColumns
-    return updatedColumns
-
 
 def id_generator(size=15):
     """Helper function to generate random div ids. This is useful for embedding
@@ -70,27 +46,6 @@ def make_html(dataset_results, id):
 	</body>
 	</html>
 	""".format(bundle=bundle, id=id, dataset_results=json.dumps(dataset_results))
-	return html_all
-
-def edit_profiler_make_html(data_dict, id):
-	lib_path = pkg_resources.resource_filename(__name__, "build/datasetsVis.js")
-	bundle = open(lib_path, "r", encoding="utf8").read()
-	html_all = """
-	<html>
-	<head>
-	</head>
-	<body>
-	    <script>
-	    {bundle}
-	    </script>
-	    <div id="{id}">
-	    </div>
-	    <script>
-	        datasetsVis.renderEditProfilerViewBundle("#{id}", {data_dict});
-	    </script>
-	</body>
-	</html>
-	""".format(bundle=bundle, id=id, data_dict=json.dumps(data_dict))
 	return html_all
 
 def getSample(text):
@@ -135,16 +90,9 @@ def prepare_dataset_results(dataframe):
     }
     return all_results
 
-def plot_data_summary(dataset_results):
+def plot_datasets_summarizer(dataset_results):
     from IPython.core.display import display, HTML
     id = id_generator()
     dataset_results_dic = prepare_dataset_results(dataset_results)
     html_all = make_html(dataset_results_dic, id)
-    display(HTML(html_all))
-
-def plot_edit_profiler(metadata):
-    from IPython.core.display import display, HTML
-    id = id_generator()
-    data_dict = prepare_data_profiler(metadata)
-    html_all = edit_profiler_make_html(data_dict, id)
     display(HTML(html_all))

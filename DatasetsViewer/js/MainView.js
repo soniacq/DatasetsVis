@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types';
 import {DatasetSample} from './DatasetSample';
-import { Card, Box } from '../node_modules/@material-ui/core/index';
 import {SummaryView} from "./SummaryView";
 import CommAPI from "./CommAPI";
 
