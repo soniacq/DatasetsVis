@@ -1,2 +1,2 @@
-include DatasetsSummarizer/build/dataProfileVis.js
-include DatasetsSummarizer/data/lifeexpectancydata.csv
+include DatasetsSummarizer/build/datasetsVis.js
+include DatasetsSummarizer/data/taxi_metadata_cleaned_cols_only.csv
