@@ -13,6 +13,17 @@ import datamart_profiler
 import pandas
 from io import StringIO
 
+
+defaultSimilarityMetrics = [
+    {"name": "Title and Description", "x": "title_and_description_x", "y": "title_and_description_y"},
+    {"name": "Title", "x": "title_x", "y": "title_y"},
+    {"name": "Description", "x": "description_x", "y": "description_y"},
+    {"name": "Column Name", "x": "column_name_x", "y": "column_name_y"}
+]
+
+def get_default_similarity_metrics():
+    return defaultSimilarityMetrics
+
 def formatMetadata(msg):
     json_data = ast.literal_eval(msg['dataneedformat'])
     data_dict = prepare_data_profiler( json_data)
@@ -27,7 +38,7 @@ def id_generator(size=15):
     return ''.join(np.random.choice(chars, size, replace=True))
 
 
-def make_html(dataset_results, id):
+def make_html(dataset_results, id, similarity_metrics):
 	lib_path = pkg_resources.resource_filename(__name__, "build/datasetsVis.js")
 	bundle = open(lib_path, "r", encoding="utf8").read()
 	html_all = """
@@ -41,11 +52,11 @@ def make_html(dataset_results, id):
 	    <div id="{id}">
 	    </div>
 	    <script>
-	        datasetsVis.renderDatasetsSummarizerBundle("#{id}", {dataset_results});
+	        datasetsVis.renderDatasetsSummarizerBundle("#{id}", {dataset_results}, {similarity_metrics});
 	    </script>
 	</body>
 	</html>
-	""".format(bundle=bundle, id=id, dataset_results=json.dumps(dataset_results))
+	""".format(bundle=bundle, id=id, dataset_results=json.dumps(dataset_results), similarity_metrics=json.dumps(similarity_metrics))
 	return html_all
 
 def getSample(text):
@@ -90,9 +101,9 @@ def prepare_dataset_results(dataframe):
     }
     return all_results
 
-def plot_datasets_summary(dataset_results):
+def plot_datasets_summary(dataset_results, similarity_metrics = defaultSimilarityMetrics):
     from IPython.core.display import display, HTML
     id = id_generator()
     dataset_results_dic = prepare_dataset_results(dataset_results)
-    html_all = make_html(dataset_results_dic, id)
+    html_all = make_html(dataset_results_dic, id, {"similarity_metrics": similarity_metrics})
     display(HTML(html_all))
