@@ -1,2 +1,2 @@
 include DatasetsSummarizer/build/datasetsVis.js
-include DatasetsSummarizer/data/taxi_metadata_cleaned_cols_only.csv
+include DatasetsSummarizer/data/taxi_full_metadata_and_scatterplot_coordinates.csv
