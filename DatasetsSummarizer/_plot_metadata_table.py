@@ -15,9 +15,9 @@ from io import StringIO
 
 
 defaultSimilarityMetrics = [
+    {"name": "Title and Description", "x": "title_and_description_x", "y": "title_and_description_y"},
     {"name": "Title", "x": "title_x", "y": "title_y"},
     {"name": "Description", "x": "description_x", "y": "description_y"},
-    {"name": "Title and Description", "x": "title_and_description_x", "y": "title_and_description_y"},
     {"name": "Column Name", "x": "column_name_x", "y": "column_name_y"}
 ]
 

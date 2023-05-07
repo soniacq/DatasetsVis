@@ -34,6 +34,20 @@ Description: # DatasetsSummarizer
         pip install datasets-summarizer
         ~~~~
         
+        ## Custom similarity metric
+        
+        Use a subset or add a new entry (`x` and `y` values ) based on a different similatiry metric. For example, here we added `x` and `y` values based on a similarity metric using a modified version of the titles. Note that `modif_title_x` and `modif_title_y` must be included in the dataframe.
+        
+        ```Python
+        new_similarity_metrics = [{'name': 'Title', 'x': 'title_x', 'y': 'title_y'},
+                                  {'name': 'ModifiedTitle', 'x': 'modif_title_x', 'y': 'modif_title_y'}
+                                 ]
+        ```
+        
+        Then, we can pass this new similarity metrics as a parameter of our visualization
+        ```Python
+        DatasetsSummarizer.plot_datasets_summary(dataframe, new_similarity_metrics)
+        ```
         
 Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
