@@ -29,18 +29,13 @@ export class MainView extends Component {
   }
 
   render(){
-    const { dataset_results } = this.props;
-    const similarityMetrics = [
-      {name: "Title", x: "title_x", y: "title_y"},
-      {name: "Description", x: "description_x", y: "description_y"},
-      {name: "Title and Description", x: "title_and_description_x", y: "title_and_description_y"},
-      {name: "Column Name", x: "column_name_x", y: "column_name_y"}
-    ];
+    const { dataset_results, similarity_metrics } = this.props;
 
     return <div ref={ref=>{this.ref = ref}}>
       <div  className="d-flex flex-row">
-        <SummaryView  hit={dataset_results}
-          similarityMetrics={similarityMetrics}
+        <SummaryView
+          hit={dataset_results}
+          similarityMetrics={similarity_metrics["similarity_metrics"]}
           onClick={
             (selectedDataset) => {
               this.handleChangeDataset (selectedDataset);
